@@ -1,5 +1,5 @@
 MFD display client for Orbiter space flight simulator.
-Act as VNC cliet for VNCMFT plugin.
+Act as VNC client for VNCMFT plugin.
 
 Modifications:
 1) Auth/encryption removed. No need for VNCMFD
@@ -8,7 +8,7 @@ Modifications:
 3) Fix RGB color problem. Red and blues was swapped.
    Don't know who to blame: python client or VNCMFD plugin
 4) Command line parameter functionality fixed.
-   You can use python3 orbitermfdclient.py vnc://your.ip.address:port
+   You can use "python3 orbitermfdclient.py vnc://your.ip.address:port"
 5) Removed compressed data encoding support from VNC client.
 
 ToDo:
