@@ -12,13 +12,13 @@ Modifications:
 5) Removed compressed data encoding support from VNC client.
 
 ToDo:
-*) Add Raspberry Pi GPIO to simulate MFD Soft button pressing.
-*) Server discovery and receive screen autoconfig via UDP. Separate soft
-*) Measure MFD latency. Maybe compressed data encoding removal was mistake
-*) More code cleanup.
-*) Hardware schematics.
-*) Case to completed project.
-*) Test keypad matrix support from adafruit
+1) Add Raspberry Pi GPIO to simulate MFD Soft button pressing.
+2) Server discovery and receive screen autoconfig via UDP. Separate soft
+3) Measure MFD latency. Maybe compressed data encoding removal was mistake
+4) More code cleanup.
+5) Hardware schematics.
+6) Case to completed project.
+7) Test keypad matrix support from adafruit
    https://learn.adafruit.com/matrix-keypad/python-circuitpython
 
 Original code:
