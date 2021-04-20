@@ -3,7 +3,7 @@ Act as VNC cliet for VNCMFT plugin.
 
 Modifications:
 1) Auth/encryption removed. No need for VNCMFD
-2) Added keyboard shorcuts to simulate
+2) Added keyboard shortcuts to simulate
    MFD Soft button pressing.
 3) Fix RGB color problem. Red and blues was swapped.
    Don't know who to blame: python client or VNCMFD plugin
