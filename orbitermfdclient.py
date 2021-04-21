@@ -20,17 +20,93 @@ from sdl2 import render, rect, surface
 from os import uname
 
 if "x86" in uname().machine.lower():
-    print("Machine: laptop")
+    rpi = False
 elif "arm" in uname().machine.lower():
+    rpi = True
+
+if rpi:
     print("Machine: RPi")
     import RPi.GPIO as GPIO
+    import digitalio
+    import board
+    import adafruit_matrixkeypad
+    cols = [digitalio.DigitalInOut(x) for x in (board.D5, board.D6, board.D13, board.D19, board.D26, board.D12)]
+    #rows = [digitalio.DigitalInOut(x) for x in (board.D13, board.D12, board.D11, board.D10)]
+    rows = [digitalio.DigitalInOut(x) for x in (board.D16, board.D20, board.D21)]
+    keys = ((1, 2, 3, 4, 5, 6),
+            ('q', 'w', 'e', 'r', 't', 'y', ),
+            ('z', 'x', 'c'))
+    keypad = adafruit_matrixkeypad.Matrix_Keypad(rows, cols, keys)
+
+def key2xy(key):
+
+    x = 1
+    y = 1
+    if key == ord("1"):
+        x = 20
+        y = 25
+    elif key == ord("2"):
+        x = 20
+        y = 65
+    elif key == ord("3"):
+        x = 20
+        y = 105
+    elif key == ord("4"):
+        x = 20
+        y = 145
+    elif key == ord("5"):
+        x = 20
+        y = 185
+    elif key == ord("6"):
+        x = 20
+        y = 225
+
+    elif key == ord("q"):
+        x = 300
+        y = 25
+    elif key == ord("w"):
+        x = 300
+        y = 65
+    elif key == ord("e"):
+        x = 300
+        y = 105
+    elif key == ord("r"):
+        x = 300
+        y = 145
+    elif key == ord("t"):
+        x = 300
+        y = 185
+    elif key == ord("y"):
+        x = 300
+        y = 225
+
+    # power button (disabled, not used)
+    elif key == ord("z"):
+        x = 140
+        y = 105
+    # select button
+    elif key == ord("x"):
+        #x = 140
+        x = 70
+        y = 1
+    # menu button
+    elif key == ord("c"):
+        #x = 255
+        x = 120
+        y = 1
     
+    # exit viewer
+    elif key == ord("p"):
+        print("P key. Exitting!")
+        sdl2.ext.quit()
+        exit()
+    #print("x=", x, ", y=", y)
+    return x, y
+        
 class Option:
     def __init__(self):
-        #self.host = '192.168.10.11'
         self.host = 'localhost'
         self.port = 35900
-        #self.port = 35901
         self.width = 320
         self.height = 240
         #self.width = 335
@@ -226,74 +302,20 @@ async def run_gui(window, renderer, client):
                 else:
                     client.pointerEvent(x, y, 0)
 
-        await asyncio.sleep(0.01)
         # here is loop
         #print(time.time())
+        if rpi:
+            pressedkeys = keypad.pressed_keys
+            if pressedkeys:
+                x,y = key2xy(pressedkeys)
+                waspressed.append(x,y)
+                client.pointerEvent(x, y, 1)
+            else:
+                while waspressed:
+                    x,y = waspressed.pop()
+                    client.pointerEvent(x, y, 0)
 
-def key2xy(key):
-
-    x = 1
-    y = 1
-    if key == ord("1"):
-        x = 20
-        y = 25
-    elif key == ord("2"):
-        x = 20
-        y = 65
-    elif key == ord("3"):
-        x = 20
-        y = 105
-    elif key == ord("4"):
-        x = 20
-        y = 145
-    elif key == ord("5"):
-        x = 20
-        y = 185
-    elif key == ord("6"):
-        x = 20
-        y = 225
-
-    elif key == ord("q"):
-        x = 300
-        y = 25
-    elif key == ord("w"):
-        x = 300
-        y = 65
-    elif key == ord("e"):
-        x = 300
-        y = 105
-    elif key == ord("r"):
-        x = 300
-        y = 145
-    elif key == ord("t"):
-        x = 300
-        y = 185
-    elif key == ord("y"):
-        x = 300
-        y = 225
-
-    # power button (disabled, not used)
-    elif key == ord("z"):
-        x = 140
-        y = 105
-    # select button
-    elif key == ord("x"):
-        #x = 140
-        x = 70
-        y = 1
-    # menu button
-    elif key == ord("c"):
-        #x = 255
-        x = 120
-        y = 1
-    
-    # exit viewer
-    elif key == ord("p"):
-        print("P key. Exitting!")
-        sdl2.ext.quit()
-        exit()
-    #print("x=", x, ", y=", y)
-    return x, y
+        await asyncio.sleep(0.01)
 
 async def main():
 
@@ -312,7 +334,7 @@ async def main():
     transport, protocol = await loop.create_connection(
         lambda: client,
         option.host, option.port)
-
+        
     await run_gui(window, renderer, client)
 
 
