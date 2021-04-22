@@ -24,6 +24,11 @@ if "x86" in uname().machine.lower():
 elif "arm" in uname().machine.lower():
     rpi = True
 
+fl = None
+fl = sdl2.SDL_WINDOW_BORDERLESS
+#fl = fl | sdl2.SDL_WINDOW_ALWAYS_ON_TOP
+#fl = fl | sdl2.SDL_WINDOW_FULLSCREEN_DESKTOP 
+    
 if rpi:
     print("Machine: RPi")
     import RPi.GPIO as GPIO
@@ -189,10 +194,7 @@ class VNCClient(rfb.RFBClient):
 
 def load_gui(option):
     sdl2.ext.init()
-    fl = None
-    #fl = sdl2.SDL_WINDOW_BORDERLESS
-    #fl = fl | sdl2.SDL_WINDOW_ALWAYS_ON_TOP
-    #fl = fl | sdl2.SDL_WINDOW_FULLSCREEN_DESKTOP    
+    # fl was here
     window = sdl2.ext.Window("VNC Viewer [%s]" % (option.remote_url()), size=(
         option.width, option.height), position=(0, 0), flags=fl)
     window.show()
