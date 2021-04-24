@@ -26,8 +26,8 @@ elif "arm" in uname().machine.lower():
 
 fl = None
 fl = sdl2.SDL_WINDOW_BORDERLESS
-#fl = fl | sdl2.SDL_WINDOW_ALWAYS_ON_TOP
-#fl = fl | sdl2.SDL_WINDOW_FULLSCREEN_DESKTOP 
+fl = fl | sdl2.SDL_WINDOW_ALWAYS_ON_TOP
+fl = fl | sdl2.SDL_WINDOW_FULLSCREEN_DESKTOP 
     
 if rpi:
     print("Machine: RPi")
@@ -35,16 +35,17 @@ if rpi:
     import digitalio
     import board
     import adafruit_matrixkeypad
-    cols = [digitalio.DigitalInOut(x) for x in (board.D5, board.D6, board.D13, board.D19, board.D26, board.D12)]
+    cols = [digitalio.DigitalInOut(x) for x in (board.D25, board.D8, board.D7, board.D12, board.D16, board.D20, board.D21)]
     #rows = [digitalio.DigitalInOut(x) for x in (board.D13, board.D12, board.D11, board.D10)]
-    rows = [digitalio.DigitalInOut(x) for x in (board.D16, board.D20, board.D21)]
-    keys = ((1, 2, 3, 4, 5, 6),
-            ('q', 'w', 'e', 'r', 't', 'y', ),
-            ('z', 'x', 'c'))
+    rows = [digitalio.DigitalInOut(x) for x in (board.D24, board.D26)]
+    keys = (("1", "2", "3", "4", "5", "6", "x"),
+            ("q", "w", "e", "r", "t", "y", "c")
+            )
     keypad = adafruit_matrixkeypad.Matrix_Keypad(rows, cols, keys)
 
 def key2xy(key):
 
+    print("key2xy:", key)
     x = 1
     y = 1
     if key == ord("1"):
@@ -110,7 +111,7 @@ def key2xy(key):
         
 class Option:
     def __init__(self):
-        self.host = 'localhost'
+        self.host = '192.168.10.11'
         self.port = 35900
         self.width = 320
         self.height = 240
@@ -208,9 +209,14 @@ async def run_gui(window, renderer, client):
     in_present = False
     buttons = 0
 
+    waspressed = ['a', 'b']
+    waspressed.clear()
+    
     renderer.clear()
-    sdl2.SDL_ShowCursor(0)
-    #sdl2.SDL_ShowCursor(1)
+    if rpi:
+        sdl2.SDL_ShowCursor(0)
+    else :
+        sdl2.SDL_ShowCursor(1)
 
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     #pformat = sdl2.pixels.SDL_AllocFormat(sdl2.pixels.SDL_PIXELFORMAT_RGB888)
@@ -309,13 +315,19 @@ async def run_gui(window, renderer, client):
         if rpi:
             pressedkeys = keypad.pressed_keys
             if pressedkeys:
-                x,y = key2xy(pressedkeys)
-                waspressed.append(x,y)
-                client.pointerEvent(x, y, 1)
+                string = "".join(pressedkeys)
+                kx,ky = key2xy(ord(string))
+                waspressed.append( [kx, ky] )
+                client.pointerEvent(kx, ky, 1)
+                #print("waspresed: ", waspressed)
+                #print("down, key: ", pressedkeys)
+                print("matrix down x, y: ", kx, ky)
             else:
                 while waspressed:
-                    x,y = waspressed.pop()
-                    client.pointerEvent(x, y, 0)
+                    kx, ky = waspressed.pop()
+                    client.pointerEvent(kx, ky, 0)
+                    #print("  up, key: ", pressedkeys)
+                    print("matrix  up x,y: ", kx, ky)
 
         await asyncio.sleep(0.01)
 
